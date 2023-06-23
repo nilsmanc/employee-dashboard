@@ -28,14 +28,21 @@ const add = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' })
     }
 
-    const employee = await prisma.user.update({
-      where: {
-        id: req.user.id,
-      },
+    // await prisma.user.update({
+    //   where: {
+    //     id: req.user.id,
+    //   },
+    //   data: {
+    //     createdEmployee: {
+    //       create: data,
+    //     },
+    //   },
+    // })
+
+    const employee = await prisma.employee.create({
       data: {
-        createdEmployee: {
-          create: data,
-        },
+        ...data,
+        userId: req.userId,
       },
     })
 
@@ -45,7 +52,29 @@ const add = async (req, res) => {
   }
 }
 
+/**
+ * @route POST /api/emoloyees/remove/:id
+ * @desc Remove employee
+ * @access Private
+ */
+const remove = async (req, res) => {
+  const { id } = req.body
+
+  try {
+    await prisma.employee.delete({
+      where: {
+        id,
+      },
+    })
+
+    res.status(204).json('OK')
+  } catch {
+    res.status(500).json({ message: 'Failed to remove employee' })
+  }
+}
+
 module.exports = {
   all,
   add,
+  remove,
 }
