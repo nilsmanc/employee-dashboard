@@ -28,17 +28,6 @@ const add = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' })
     }
 
-    // await prisma.user.update({
-    //   where: {
-    //     id: req.user.id,
-    //   },
-    //   data: {
-    //     createdEmployee: {
-    //       create: data,
-    //     },
-    //   },
-    // })
-
     const employee = await prisma.employee.create({
       data: {
         ...data,
@@ -73,8 +62,54 @@ const remove = async (req, res) => {
   }
 }
 
+/**
+ * @route PUT /api/emoloyees/edit/:id
+ * @desc Edit employee
+ * @access Private
+ */
+const edit = async (req, res) => {
+  const data = req.body
+  const id = data.id
+
+  try {
+    await prisma.employee.update({
+      where: {
+        id,
+      },
+      data,
+    })
+
+    res.status(204).json('OK')
+  } catch {
+    res.status(500).json({ message: 'Failed to edit employee' })
+  }
+}
+
+/**
+ * @route GET /api/emoloyees/:id
+ * @desc Get employee
+ * @access Private
+ */
+const employee = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    res.status(200).json(employee)
+  } catch {
+    res.status(500).json({ message: 'Failed to get employee' })
+  }
+}
+
 module.exports = {
   all,
   add,
   remove,
+  edit,
+  employee,
 }
